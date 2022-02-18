@@ -291,9 +291,9 @@ hopkins_cellpop_merged_zscore <-
   hopkins_cellpop_merged %>% 
   mutate_at(vars(Kcross.Cancer2lympho:localized_LS), scale)
 
-univ_formulas <- sapply(names(hopkins_clustering_merged_zscore)[15:66],function(x)as.formula(paste('response~',x)))
+univ_formulas <- sapply(names(hopkins_cellpop_merged_zscore)[15:63],function(x)as.formula(paste('response~',x)))
 
-univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_clustering_merged_zscore)})
+univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_cellpop_merged_zscore)})
 
 univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
 
