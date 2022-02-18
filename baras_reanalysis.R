@@ -102,7 +102,7 @@ clin_plus_cellpop_963 <- merge(test963, hopkins_cell_pop963, by = 'TMA.core', al
 
 hopkins_cellpop_merged <- rbind(clin_plus_cellpop_1042, clin_plus_cellpop_963)
 
-#univariate logistic regrssion analysis for clustering features 
+#univariate logistic regrssion analysis for cell population features 
 
 univ_formulas <- sapply(names(hopkins_cellpop_merged)[15:63],function(x)as.formula(paste('response~',x)))
 
@@ -118,7 +118,7 @@ clin_plus_imgfeat_963 <- merge(test963, hopkins_image_texture_963, by = 'TMA.cor
 
 hopkins_imgfeat_merged <- rbind(clin_plus_imgfeat_1042, clin_plus_imgfeat_963)
 
-#univariate logistic regrssion analysis for clustering features 
+#univariate logistic regrssion analysis for image texture features 
 
 univ_formulas <- sapply(names(hopkins_imgfeat_merged)[16:500],function(x)as.formula(paste('response~',x)))
 
@@ -218,6 +218,33 @@ cluster_cor_p <- flattenCorrMatrix(cluster_cor_with_p$r, cluster_cor_with_p$P)
 
 write.csv(cluster_cor_p, "cluster_cor.csv", row.names = FALSE)
 
+
+#making correlation matrices for cell population features
+#making correlation matrices for cell population features
+#making correlation matrices for cell population features
+
+hopkins_cellpop_merged
+
+cellpop_cor_dta <- hopkins_cellpop_merged
+
+cellpop_cor_dta <- cellpop_cor_dta[,15:63]
+
+cellpop_cor <-  cor(cellpop_cor_dta, use = 'complete.obs')
+
+p1 <- { # Prepare the Corrplot 
+  corrplot(cellpop_cor, method = 'color', type = "upper", order = "AOE", 
+           tl.col = "black", tl.cex = 0.3);
+  # Call the recordPlot() function to record the plot
+  recordPlot()
+}
+
+ggsave(filename = "cellpop_cor.pdf", plot = replayPlot(p1))
+
+cellpop_cor_p <- rcorr(as.matrix(cellpop_cor_dta))
+
+cellpop_cor_with_p <- flattenCorrMatrix(cellpop_cor_p$r, cellpop_cor_p$P)
+
+write.csv(cellpop_cor_with_p, "cellpop_cor.csv", row.names = FALSE)
 
 
 
