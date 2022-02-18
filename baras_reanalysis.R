@@ -246,10 +246,56 @@ cellpop_cor_with_p <- flattenCorrMatrix(cellpop_cor_p$r, cellpop_cor_p$P)
 
 write.csv(cellpop_cor_with_p, "cellpop_cor.csv", row.names = FALSE)
 
+#repeating logistic regression analysis for nuclear morphology features with z-scored values
+#repeating logistic regression analysis for nuclear morphology features with z-scored values
+#repeating logistic regression analysis for nuclear morphology features with z-scored values
+
+hopkins_nuc_morph_merged_zscore <- 
+  hopkins_nuc_morph_merged %>% 
+  mutate_at(vars(Area.um.2_Max:MOI_CoV), scale)
+
+hopkins_nuc_morph_merged_zscore <- subset(hopkins_nuc_morph_merged_zscore,
+                                          select = -c(Solidity_Max, n_indentation_Min, n_protrusion_Min))
+
+
+
+univ_formulas <- sapply(names(hopkins_nuc_morph_merged_zscore)[14:70],function(x)as.formula(paste('response~',x)))
+
+univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_nuc_morph_merged_zscore)})
+
+univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
+
+
+#repeating logistic regression analysis for clustering morphology features with z-scored values
+#repeating logistic regression analysis for clustering morphology features with z-scored values
+#repeating logistic regression analysis for clustering morphology features with z-scored values
+
+hopkins_clustering_merged_zscore <- 
+  hopkins_clustering_merged %>% 
+  mutate_at(vars(Density_of_nucleus_mean:COrE_SumVariance_min), scale)
+
+univ_formulas <- sapply(names(hopkins_clustering_merged_zscore)[14:66],function(x)as.formula(paste('response~',x)))
+
+univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_clustering_merged_zscore)})
+
+univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
 
 
 
 
+#repeating logistic regression analysis for cell population features with z-scored values
+#repeating logistic regression analysis for cell population features with z-scored values
+#repeating logistic regression analysis for cell population features with z-scored values
+
+hopkins_cellpop_merged_zscore <- 
+  hopkins_cellpop_merged %>% 
+  mutate_at(vars(Kcross.Cancer2lympho:localized_LS), scale)
+
+univ_formulas <- sapply(names(hopkins_clustering_merged_zscore)[15:66],function(x)as.formula(paste('response~',x)))
+
+univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_clustering_merged_zscore)})
+
+univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
 
 
 
