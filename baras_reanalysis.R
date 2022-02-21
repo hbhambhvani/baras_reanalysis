@@ -188,8 +188,24 @@ nuc_cor_p <- flattenCorrMatrix(res2$r, res2$P)
 
 write.csv(nuc_cor_p, "nuc_morph_cor.csv", row.names = FALSE)
 
+#remaking nuclear feature correlation matrix for Spearman's coefficient
 
+nuc_cor_spearman <-  cor(nuc_cor_dta, use = 'complete.obs', method = 'spearman')
 
+p1 <- { # Prepare the Corrplot 
+  corrplot(nuc_cor_spearman, method = 'color', type = "upper", order = "AOE", 
+           tl.col = "black", tl.cex = 0.3);
+  # Call the recordPlot() function to record the plot
+  recordPlot()
+}
+
+ggsave(filename = "p1.pdf", plot = replayPlot(p1))
+
+res2 <- rcorr(as.matrix(nuc_cor_dta), type = 'spearman')
+
+nuc_cor_p_sp <- flattenCorrMatrix(res2$r, res2$P)
+
+write.csv(nuc_cor_p_sp, "nuc_morph_cor_spearman.csv", row.names = FALSE)
 
 
 #making correlation matrices for clustering  features
@@ -219,6 +235,26 @@ cluster_cor_p <- flattenCorrMatrix(cluster_cor_with_p$r, cluster_cor_with_p$P)
 write.csv(cluster_cor_p, "cluster_cor.csv", row.names = FALSE)
 
 
+#remaking cluster feature correlation matrix for Spearman's coefficient
+
+cluster_cor_spearman <-  cor(clustering_cor_dta, use = 'complete.obs', method = 'spearman')
+
+p1 <- { # Prepare the Corrplot 
+  corrplot(cluster_cor_spearman, method = 'color', type = "upper", order = "AOE", 
+           tl.col = "black", tl.cex = 0.3);
+  # Call the recordPlot() function to record the plot
+  recordPlot()
+}
+
+ggsave(filename = "p1.pdf", plot = replayPlot(p1))
+
+cluster_cor_with_p_sp <- rcorr(as.matrix(clustering_cor_dta), type = 'spearman')
+
+cluster_cor_p_sp <- flattenCorrMatrix(res2$r, res2$P)
+
+write.csv(cluster_cor_p_sp, "cluster_cor_spearman.csv", row.names = FALSE)
+
+
 #making correlation matrices for cell population features
 #making correlation matrices for cell population features
 #making correlation matrices for cell population features
@@ -245,6 +281,26 @@ cellpop_cor_p <- rcorr(as.matrix(cellpop_cor_dta))
 cellpop_cor_with_p <- flattenCorrMatrix(cellpop_cor_p$r, cellpop_cor_p$P)
 
 write.csv(cellpop_cor_with_p, "cellpop_cor.csv", row.names = FALSE)
+
+#remaking cell population feature correlation matrix for Spearman's coefficient
+
+cellpop_cor_spearman <-  cor(cellpop_cor_dta, use = 'complete.obs', method = 'spearman')
+
+p1 <- { # Prepare the Corrplot 
+  corrplot(cellpop_cor_spearman, method = 'color', type = "upper", order = "AOE", 
+           tl.col = "black", tl.cex = 0.3);
+  # Call the recordPlot() function to record the plot
+  recordPlot()
+}
+
+ggsave(filename = "p1.pdf", plot = replayPlot(p1))
+
+cellpop_cor_p_sp <- rcorr(as.matrix(cellpop_cor_dta), type = 'spearman')
+
+cellpop_cor_with_p_sp <- flattenCorrMatrix(cellpop_cor_p_sp$r, cellpop_cor_p_sp$P)
+
+write.csv(cellpop_cor_with_p_sp, "cellpop_cor_spearman.csv", row.names = FALSE)
+
 
 #repeating logistic regression analysis for nuclear morphology features with z-scored values
 #repeating logistic regression analysis for nuclear morphology features with z-scored values
@@ -296,6 +352,16 @@ univ_formulas <- sapply(names(hopkins_cellpop_merged_zscore)[15:63],function(x)a
 univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data=hopkins_cellpop_merged_zscore)})
 
 univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
+
+
+
+x <- iris[,c(1, 3)]
+
+stats::kmeans(x, centers = 3, nstart = 10)
+
+
+
+
 
 
 
