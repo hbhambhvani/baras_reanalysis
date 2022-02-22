@@ -363,7 +363,7 @@ stats::kmeans(x, centers = 3, nstart = 10)
 
 
 
-
+test <- glm(hopkins_nuc_morph_merged$response ~ hopkins_nuc_morph_merged$Min.diameter.um_CoV, family = 'binomial', data = hopkins_nuc_morph_merged)
 
 
 
