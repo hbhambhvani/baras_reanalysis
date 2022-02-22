@@ -354,16 +354,28 @@ univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data
 univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
 
 
+#unsupervised clustering analysis 
+#unsupervised clustering analysis 
+#unsupervised clustering analysis 
 
-x <- iris[,c(1, 3)]
+nuc_morph_clustering <- hopkins_nuc_morph_merged
 
-stats::kmeans(x, centers = 3, nstart = 10)
+nuc_morph_clustering <- t(nuc_morph_clustering[,14:66])
 
+nuc_morph_clustering <- nuc_morph_clustering[,colSums(is.na(nuc_morph_clustering))<nrow(nuc_morph_clustering)]
 
+nuc_morph_clustering <- scale(nuc_morph_clustering)
 
+# Dissimilarity matrix
+d <- dist(nuc_morph_clustering, method = "euclidean")
 
+# Hierarchical clustering using Complete Linkage
+hc1 <- hclust(d, method = "complete" )
 
-test <- glm(hopkins_nuc_morph_merged$response ~ hopkins_nuc_morph_merged$Min.diameter.um_CoV, family = 'binomial', data = hopkins_nuc_morph_merged)
+# Plot the obtained dendrogram
+plot(as.dendrogram(hc1))
+plot(hc1, cex = 0.6, hang = -1, ylim = c(0,10))
+
 
 
 
