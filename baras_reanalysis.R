@@ -354,27 +354,144 @@ univ_models <- lapply(univ_formulas, function(x){glm(x,family = 'binomial', data
 univ_results <- lapply(univ_models,function(x){return(cbind(exp(coef(x)), exp(confint(x)),summary(x)$coefficients[,4]))})
 
 
-#unsupervised clustering analysis 
-#unsupervised clustering analysis 
-#unsupervised clustering analysis 
+#unsupervised clustering analysis, starting with nuclear morph respondners
+#unsupervised clustering analysis, starting with nuclear morph respondners
+#unsupervised clustering analysis, starting with nuclear morph respondners
 
-nuc_morph_clustering <- hopkins_nuc_morph_merged
+nuc_morph_resp_clustering <- hopkins_nuc_morph_merged[hopkins_nuc_morph_merged$response == 1,]
 
-nuc_morph_clustering <- t(nuc_morph_clustering[,14:66])
+nuc_morph_resp_clustering <- t(nuc_morph_resp_clustering[,14:66])
 
-nuc_morph_clustering <- nuc_morph_clustering[,colSums(is.na(nuc_morph_clustering))<nrow(nuc_morph_clustering)]
+nuc_morph_resp_clustering <- nuc_morph_resp_clustering[,colSums(is.na(nuc_morph_resp_clustering))<nrow(nuc_morph_resp_clustering)]
 
-nuc_morph_clustering <- scale(nuc_morph_clustering)
+nuc_morph_resp_clustering <- scale(nuc_morph_resp_clustering)
 
 # Dissimilarity matrix
-d <- dist(nuc_morph_clustering, method = "euclidean")
+d <- dist(nuc_morph_resp_clustering, method = "euclidean")
 
 # Hierarchical clustering using Complete Linkage
-hc1 <- hclust(d, method = "complete" )
+hc1 <- hclust(d, method = "complete")
 
-# Plot the obtained dendrogram
-plot(as.dendrogram(hc1))
-plot(hc1, cex = 0.6, hang = -1, ylim = c(0,10))
+pdf("nuc_morph_resp_clustering.pdf", width=40, height=35)
+
+# Do some plotting
+plot(hc1)
+
+# Close the PDF file's associated graphics device (necessary to finalize the output)
+dev.off()
+
+#moving on to nuclear morphology non responders
+
+nuc_morph_nonresp_clustering <- hopkins_nuc_morph_merged[hopkins_nuc_morph_merged$response == 0,]
+
+nuc_morph_nonresp_clustering <- t(nuc_morph_nonresp_clustering[,14:66])
+
+nuc_morph_nonresp_clustering <- nuc_morph_nonresp_clustering[,colSums(is.na(nuc_morph_nonresp_clustering))<nrow(nuc_morph_nonresp_clustering)]
+
+nuc_morph_nonresp_clustering <- scale(nuc_morph_nonresp_clustering)
+
+d <- dist(nuc_morph_nonresp_clustering, method = "euclidean")
+
+hc1 <- hclust(d, method = "complete")
+
+pdf("nuc_morph_nonresp_clustering.pdf", width=40, height=35)
+
+plot(hc1)
+
+dev.off()
+
+# Moving on to clustering features among responders
+
+clusterFeat_resp_clustering <- hopkins_clustering_merged[hopkins_clustering_merged$response == 1,]
+
+clusterFeat_resp_clustering <- t(clusterFeat_resp_clustering[,14:66])
+
+clusterFeat_resp_clustering <- clusterFeat_resp_clustering[,colSums(is.na(clusterFeat_resp_clustering))<nrow(clusterFeat_resp_clustering)]
+
+clusterFeat_resp_clustering <- scale(clusterFeat_resp_clustering)
+
+d <- dist(clusterFeat_resp_clustering, method = "euclidean")
+
+hc1 <- hclust(d, method = "complete")
+
+plot(hc1)
+
+pdf("clusterFeat_resp_clustering.pdf", width=40, height=35)
+
+plot(hc1)
+
+dev.off()
+
+#moving on to clustering features among nonresponders
+
+clusterFeat_nonresp_clustering <- hopkins_clustering_merged[hopkins_clustering_merged$response == 0,]
+
+clusterFeat_nonresp_clustering <- t(clusterFeat_nonresp_clustering[,14:66])
+
+clusterFeat_nonresp_clustering <- clusterFeat_nonresp_clustering[,colSums(is.na(clusterFeat_nonresp_clustering))<nrow(clusterFeat_nonresp_clustering)]
+
+clusterFeat_nonresp_clustering <- scale(clusterFeat_nonresp_clustering)
+
+d <- dist(clusterFeat_nonresp_clustering, method = "euclidean")
+
+hc1 <- hclust(d, method = "complete")
+
+plot(hc1)
+
+pdf("clusterFeat_nonresp_clustering.pdf", width=40, height=35)
+
+plot(hc1)
+
+dev.off()
+
+
+#moving on to cell population features among responders
+
+cellpop_resp_clustering <- hopkins_cellpop_merged[hopkins_cellpop_merged$response == 1,]
+
+cellpop_resp_clustering <- t(cellpop_resp_clustering[,15:63])
+
+cellpop_resp_clustering <- cellpop_resp_clustering[,colSums(is.na(cellpop_resp_clustering))<nrow(cellpop_resp_clustering)]
+
+cellpop_resp_clustering <- scale(cellpop_resp_clustering)
+
+d <- dist(cellpop_resp_clustering, method = "euclidean")
+
+hc1 <- hclust(d, method = "complete")
+
+plot(hc1)
+
+pdf("cellpop_resp_clustering.pdf", width=40, height=35)
+
+plot(hc1)
+
+dev.off()
+
+#moving on to cell population features among nonresponders
+
+cellpop_nonresp_clustering <- hopkins_cellpop_merged[hopkins_cellpop_merged$response == 0,]
+
+cellpop_nonresp_clustering <- t(cellpop_nonresp_clustering[,15:63])
+
+cellpop_nonresp_clustering <- cellpop_nonresp_clustering[,colSums(is.na(cellpop_nonresp_clustering))<nrow(cellpop_nonresp_clustering)]
+
+cellpop_nonresp_clustering <- scale(cellpop_nonresp_clustering)
+
+d <- dist(cellpop_nonresp_clustering, method = "euclidean")
+
+hc1 <- hclust(d, method = "complete")
+
+plot(hc1)
+
+pdf("cellpop_nonresp_clustering.pdf", width=40, height=35)
+
+plot(hc1)
+
+dev.off()
+
+
+
+
 
 
 
