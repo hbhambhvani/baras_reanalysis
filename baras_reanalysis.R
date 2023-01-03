@@ -489,6 +489,159 @@ plot(hc1)
 
 dev.off()
 
+### combining all of the datasets in order to develop a Cox model
+
+test <- merge(hopkins_nuc_morph_merged, hopkins_clustering_merged, by = 'uniqueID', all.x = TRUE, sort = FALSE)
+
+test2 <- merge(test, hopkins_cellpop_merged, by = 'uniqueID', all.x = TRUE, sort = FALSE)
+
+test3 <- test2[is.na(test2$Area.um.2_Max) == FALSE,]
+
+
+
+### trying models to predict response now with all features 
+### trying models to predict response now with all features 
+### trying models to predict response now with all features 
+
+
+baras_dta <- select(test3, c('response',
+                             'elongation_CoV', 
+                             'Min.diameter.um_CoV',
+                             'elongation_Min',
+                             'Circularity_CoV',
+                             'elongation_Mean',
+                             'Circularity_Mean',
+                             'chullArea_Min',
+                             'chullLength_Min',
+                             'Length.um_CoV',
+                             'chullLength_Mean',
+                             'chullLength_CoV',
+                             'chullArea_Mean',
+                             'Max.diameter.um_CoV',
+                             'convexity_Max',
+                             'convexity_Mean',
+                             'curvMeanStat',
+                             'MOI_Max',
+                             'Density_of_nucleus_mean',
+                             'Density_of_nucleus_min',
+                             'Number_of_triangles',
+                             'Perimeter_of_triangle_mean',
+                             'Area_of_triangle_mean',
+                             'Area_of_triangle_min',
+                             'stromal_ratio',
+                             'lymphocyte.dens',
+                             'cancer.dens',
+                             'cancer.to.lympho.avgCount',
+                             'cancer.to.stroma.avgCount',
+                             'ShannonH',
+                             'DoC_TL_min',
+                             'DoC_LT_min',
+                             'DoC_TS_max'))
+
+baras_dta <- baras_dta %>% mutate(response = as.factor(response))
+
+#split into train and test data sets
+
+baras_dta_split <- initial_split(baras_dta, prop = 4/5, strata = response)
+
+baras_dta_training <- training(baras_dta_split)
+baras_dta_testing  <- testing(baras_dta_split)
+
+#create cross validation folds
+
+baras_dta_folds <- vfold_cv(baras_dta_training, v = 5)
+
+### random forest modeling
+### random forest modeling
+### random forest modeling
+
+rf_rec <- 
+  recipe(response ~ ., data = baras_dta_training) %>% 
+  step_zv(all_predictors())
+
+prep(rf_rec)
+
+#random forest model specs
+
+rf_mod <- 
+  rand_forest(trees = 1000,
+              mtry = tune(),
+              min_n = tune()) %>% 
+  set_engine("ranger") %>% 
+  set_mode("classification")
+
+#create a workflow to pair recipe and the model
+
+rf_workflow <- workflow() %>%
+  add_model(rf_mod) %>%
+  add_recipe(rf_rec)
+
+#tune hyperparameters across folds 
+
+rf_tune <- 
+  rf_workflow %>% 
+  tune_grid(resamples = baras_dta_folds,
+            grid = 11)
+
+#get tuning results 
+
+rf_tune_results <- collect_metrics(rf_tune)
+
+#finalize the workflow
+
+final_rf <- rf_workflow %>%
+  finalize_workflow(select_best(rf_tune, metric = 'roc_auc'))
+
+#develop final model and assess on hold-out test set
+
+rf_final_fit <- last_fit(final_rf, baras_dta_split)
+
+collect_metrics(rf_final_fit)
+
+#trying out SVM
+
+
+baras_dta_rec_svm <- 
+  recipe(response ~ ., data = baras_dta_training) %>% 
+  step_zv(all_predictors())
+
+prep(baras_dta_rec_svm)
+
+svm_mod <-
+  svm_rbf(cost = tune(), rbf_sigma = tune()) %>%
+  set_mode("classification") %>%
+  set_engine("kernlab")
+
+svm_workflow <- 
+  workflow() %>% 
+  add_model(svm_mod) %>% 
+  add_recipe(baras_dta_rec_svm)
+
+svm_tune <- 
+  svm_workflow %>% 
+  tune_grid(resamples = baras_dta_folds,
+            grid = 10)
+
+test <- collect_metrics(svm_tune)
+
+final_svm <- svm_workflow %>%
+  finalize_workflow(select_best(svm_tune, metric = 'roc_auc'))
+
+#develop final model
+
+svm_final_fit <- last_fit(final_svm, baras_dta_split)
+
+collect_metrics(svm_final_fit)
+
+test <- collect_predictions(nn_final_fit)
+
+
+
+
+
+
+
+
 
 
 
